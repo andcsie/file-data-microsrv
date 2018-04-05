@@ -8,6 +8,7 @@ const multer = require('multer');
 const bodyParser = require('body-parser');
 let size = "";
 let sizeObj = {};
+let url = "";
 // we've started you off with Express, 
 // but feel free to use whatever libs or frameworks you'd like through `package.json`.
 
@@ -31,21 +32,28 @@ var storage = multer.diskStorage({
 
 var upload = multer({storage : storage}).single('fileUploaded');
 
-app.post("/get-file-size", (req, res) =>{
+app.post("/get-file-size", (req, res, next) =>{
   upload(req, res, function(err) {
     if (err){
       return res.send(err);
     }else{
-      sizeObj.size = req.file.size;
-      //res.redirect("/get-file-size");
-      res.json({size :size});
+      size = req.file.size;
+      sizeObj.size = size;
+      url = req.protocol + '://' + req.get('host') + req.originalUrl;
+      res.send({ redirect: url });
     }
   });
 });
 
 app.get("/get-file-size", (req, res) => {
-  res.json(sizeObj);
-  res.sendFile(__dirname + '/views/file-size.html');
+  res.sendFile(__dirname + '/views/file-size.html', (err)=> {
+    if (err){
+      res.send(err);
+    }else{
+      res.setHeader("Content-Type", "text/html")
+      res.json(sizeObj);
+    }
+  });
 });
 
 // listen for requests :)
