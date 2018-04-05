@@ -15,6 +15,7 @@ form.addEventListener('submit', function(evt){
     oReq.onload = function(event) {
       if (oReq.status === 200){
         console.log("Ok");
+        document.location.href = JSON.parse(oReq.response).redirect;
       }else{
         console.log("Error");
       }
